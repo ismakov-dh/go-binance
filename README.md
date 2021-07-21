@@ -23,6 +23,7 @@ Name | Description | Status
 [margin-api.md](https://github.com/binance-exchange/binance-official-api-docs/blob/master/margin-api.md) | Details on the Margin API (/sapi) | <input type="checkbox" checked>  Implemented
 [futures-api.md](https://binance-docs.github.io/apidocs/futures/en/#general-info) | Details on the Futures API (/fapi) | <input type="checkbox" checked>  Partially Implemented
 [delivery-api.md](https://binance-docs.github.io/apidocs/delivery/en/#general-info) | Details on the Coin-M Futures API (/dapi) | <input type="checkbox" checked>  Partially Implemented
+[brokerage-api.md](https://binance-docs.github.io/Brokerage-API/) | Details on the Brokerage API (/sapi) | <input type="checkbox" checked>  Partially Implemented
 
 ### Installation
 
