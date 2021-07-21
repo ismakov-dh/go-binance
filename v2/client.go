@@ -624,3 +624,23 @@ func (c *Client) NewListDustLogService() *ListDustLogService {
 func (c *Client) NewDustTransferService() *DustTransferService {
 	return &DustTransferService{c: c}
 }
+
+// NewCreateSubAccountService init creating subaccount service
+func (c *Client) NewCreateSubAccountService() *CreateSubAccountService {
+	return &CreateSubAccountService{c: c}
+}
+
+// NewCreateSubAccountApiKeyService init creating subaccount API key service
+func (c *Client) NewCreateSubAccountApiKeyService() *CreateSubAccountApiKeyService {
+	return &CreateSubAccountApiKeyService{c: c}
+}
+
+// NewDeleteSubAccountApiKeyService init deletion subaccount API key service
+func (c *Client) NewDeleteSubAccountApiKeyService() *DeleteSubAccountApiKeyService {
+	return &DeleteSubAccountApiKeyService{c: c}
+}
+
+// NewListSubAccountsService init list subaccounts service
+func (c *Client) NewListSubAccountsService() *ListSubAccountsService {
+	return &ListSubAccountsService{c: c}
+}
