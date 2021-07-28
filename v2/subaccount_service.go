@@ -176,12 +176,12 @@ func (s *DeleteSubAccountApiKeyService) deleteSubAccountApiKey(ctx context.Conte
 	return data, nil
 }
 
-func (s *DeleteSubAccountApiKeyService) Do(ctx context.Context, opts ...RequestOption) (res *CreateSubAccountApiKeyResponse, err error) {
+func (s *DeleteSubAccountApiKeyService) Do(ctx context.Context, opts ...RequestOption) (res *DeleteSubAccountApiKeyResponse, err error) {
 	data, err := s.deleteSubAccountApiKey(ctx, "/sapi/v1/broker/subAccountApi", opts...)
 	if err != nil {
 		return nil, err
 	}
-	res = new(CreateSubAccountApiKeyResponse)
+	res = new(DeleteSubAccountApiKeyResponse)
 	err = json.Unmarshal(data, res)
 	if err != nil {
 		return nil, err
