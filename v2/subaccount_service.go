@@ -201,7 +201,9 @@ func (s *ListSubAccountsService) Do(ctx context.Context, opts ...RequestOption) 
 		endpoint: "/sapi/v1/broker/subAccount",
 		secType:  secTypeSigned,
 	}
-	r.setParam("subAccountId", s.subAccountId)
+	if s.subAccountId != nil {
+		r.setParam("subAccountId", *s.subAccountId)
+	}
 	if s.page != nil {
 		r.setParam("page", *s.page)
 	}
