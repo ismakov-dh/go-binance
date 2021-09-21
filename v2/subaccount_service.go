@@ -36,7 +36,7 @@ type (
 		subAccountId     string
 		subAccountApiKey string
 	}
-	ListSubAccountsService         struct {
+	ListSubAccountsService struct {
 		c            *Client
 		subAccountId *string
 		page         *int64
@@ -46,10 +46,10 @@ type (
 		SubAccountId          string `json:"subaccountId"`
 		Email                 string `json:"email"`
 		Tag                   string `json:"tag"`
-		MakerCommission       int    `json:"makerCommission"`
-		TakerCommission       int    `json:"takerCommission"`
-		MarginMakerCommission int    `json:"marginMakerCommission"`
-		MarginTakerCommission int    `json:"marginTakerCommission"`
+		MakerCommission       string `json:"makerCommission"`
+		TakerCommission       string `json:"takerCommission"`
+		MarginMakerCommission string `json:"marginMakerCommission"`
+		MarginTakerCommission string `json:"marginTakerCommission"`
 		CreateTime            int64  `json:"createTime"`
 	}
 )
