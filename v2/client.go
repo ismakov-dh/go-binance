@@ -630,6 +630,16 @@ func (c *Client) NewCreateSubAccountService() *CreateSubAccountService {
 	return &CreateSubAccountService{c: c}
 }
 
+// NewEnableMarginForSubAccountService init margin trading subaccount service
+func (c *Client) NewEnableMarginForSubAccountService() *EnableMarginForSubAccountService {
+	return &EnableMarginForSubAccountService{c: c}
+}
+
+// NewEnableFuturesForSubAccountService init futures trading subaccount service
+func (c *Client) NewEnableFuturesForSubAccountService() *EnableFuturesForSubAccountService {
+	return &EnableFuturesForSubAccountService{c: c}
+}
+
 // NewCreateSubAccountApiKeyService init creating subaccount API key service
 func (c *Client) NewCreateSubAccountApiKeyService() *CreateSubAccountApiKeyService {
 	return &CreateSubAccountApiKeyService{c: c}
