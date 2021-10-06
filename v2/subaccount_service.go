@@ -260,8 +260,8 @@ func (s *EnableMarginForSubAccountService) Do(ctx context.Context, opts ...Reque
 		secType:  secTypeSigned,
 	}
 	m := params{
-		"subAccountId":     s.subAccountId,
-		"margin": s.margin,
+		"subAccountId": s.subAccountId,
+		"margin":       s.margin,
 	}
 	r.setFormParams(m)
 	data, err := s.c.callAPI(ctx, r, opts...)
@@ -289,12 +289,12 @@ func (s *EnableFuturesForSubAccountService) Futures(futures bool) *EnableFutures
 func (s *EnableFuturesForSubAccountService) Do(ctx context.Context, opts ...RequestOption) (res *EnableFuturesForSubAccountResponse, err error) {
 	r := &request{
 		method:   "POST",
-		endpoint: "/sapi/v1/broker/subAccount/margin",
+		endpoint: "/sapi/v1/broker/subAccount/futures",
 		secType:  secTypeSigned,
 	}
 	m := params{
-		"subAccountId":     s.subAccountId,
-		"futures": s.futures,
+		"subAccountId": s.subAccountId,
+		"futures":      s.futures,
 	}
 	r.setFormParams(m)
 	data, err := s.c.callAPI(ctx, r, opts...)
