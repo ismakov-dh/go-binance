@@ -91,7 +91,7 @@ type (
 	}
 	IPRestrictionForSubAccountResponse struct {
 		SubAccountId string   `json:"subaccountId"`
-		IpRestrict   bool     `json:"ipRestrict"`
+		IpRestrict   string   `json:"ipRestrict"`
 		Apikey       string   `json:"apikey"`
 		IpList       []string `json:"ipList"`
 		UpdateTime   int64    `json:"updateTime"`
