@@ -52,6 +52,26 @@ type (
 		MarginTakerCommission string `json:"marginTakerCommission"`
 		CreateTime            int64  `json:"createTime"`
 	}
+	EnableMarginForSubAccountService struct {
+		c   *Client
+		subAccountId string
+		margin bool
+	}
+	EnableFuturesForSubAccountService struct {
+		c   *Client
+		subAccountId string
+		futures bool
+	}
+	EnableMarginForSubAccountResponse struct {
+		SubAccountId string `json:"subaccountId"`
+		EnableMargin bool   `json:"enableMargin"`
+		UpdateTime   int64  `json:"updateTime"`
+	}
+	EnableFuturesForSubAccountResponse struct {
+		SubAccountId  string `json:"subaccountId"`
+		EnableFutures bool   `json:"enableFutures"`
+		UpdateTime    int64  `json:"updateTime"`
+	}
 )
 
 func (s *CreateSubAccountService) Tag(tag string) *CreateSubAccountService {
@@ -219,6 +239,72 @@ func (s *ListSubAccountsService) Do(ctx context.Context, opts ...RequestOption) 
 	err = json.Unmarshal(data, &res)
 	if err != nil {
 		return []*SubAccount{}, err
+	}
+	return res, nil
+}
+
+func (s *EnableMarginForSubAccountService) SubAccountId(subAccountId string) *EnableMarginForSubAccountService {
+	s.subAccountId = subAccountId
+	return s
+}
+
+func (s *EnableMarginForSubAccountService) Margin(margin bool) *EnableMarginForSubAccountService {
+	s.margin = margin
+	return s
+}
+
+func (s *EnableMarginForSubAccountService) Do(ctx context.Context, opts ...RequestOption) (res *EnableMarginForSubAccountResponse, err error) {
+	r := &request{
+		method:   "POST",
+		endpoint: "/sapi/v1/broker/subAccount/margin",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"subAccountId":     s.subAccountId,
+		"margin": s.margin,
+	}
+	r.setFormParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(EnableMarginForSubAccountResponse)
+	err = json.Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *EnableFuturesForSubAccountService) SubAccountId(subAccountId string) *EnableFuturesForSubAccountService {
+	s.subAccountId = subAccountId
+	return s
+}
+
+func (s *EnableFuturesForSubAccountService) Futures(futures bool) *EnableFuturesForSubAccountService {
+	s.futures = futures
+	return s
+}
+
+func (s *EnableFuturesForSubAccountService) Do(ctx context.Context, opts ...RequestOption) (res *EnableFuturesForSubAccountResponse, err error) {
+	r := &request{
+		method:   "POST",
+		endpoint: "/sapi/v1/broker/subAccount/margin",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"subAccountId":     s.subAccountId,
+		"futures": s.futures,
+	}
+	r.setFormParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(EnableFuturesForSubAccountResponse)
+	err = json.Unmarshal(data, res)
+	if err != nil {
+		return nil, err
 	}
 	return res, nil
 }
