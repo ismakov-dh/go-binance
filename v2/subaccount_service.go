@@ -10,7 +10,6 @@ type (
 		c   *Client
 		tag *string
 	}
-
 	CreateSubAccountResponse struct {
 		SubAccountId string `json:"subaccountId"`
 		Email        string `json:"email"`
@@ -71,6 +70,31 @@ type (
 		SubAccountId  string `json:"subaccountId"`
 		EnableFutures bool   `json:"enableFutures"`
 		UpdateTime    int64  `json:"updateTime"`
+	}
+	AddIPRestrictionForSubAccountService struct {
+		c   *Client
+		subAccountId string
+		subAccountApiKey string
+		ipAddress string
+	}
+	AddIPRestrictionForSubAccountResponse struct {
+		SubAccountId string `json:"subaccountId"`
+		Apikey       string `json:"apikey"`
+		Ip           string `json:"ip"`
+		UpdateTime   int64  `json:"updateTime"`
+	}
+	IPRestrictionForSubAccountService struct {
+		c   *Client
+		subAccountId string
+		subAccountApiKey string
+		ipRestrict bool
+	}
+	IPRestrictionForSubAccountResponse struct {
+		SubAccountId string   `json:"subaccountId"`
+		IpRestrict   bool     `json:"ipRestrict"`
+		Apikey       string   `json:"apikey"`
+		IpList       []string `json:"ipList"`
+		UpdateTime   int64    `json:"updateTime"`
 	}
 )
 
@@ -302,6 +326,84 @@ func (s *EnableFuturesForSubAccountService) Do(ctx context.Context, opts ...Requ
 		return nil, err
 	}
 	res = new(EnableFuturesForSubAccountResponse)
+	err = json.Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *AddIPRestrictionForSubAccountService) SubAccountId(subAccountId string) *AddIPRestrictionForSubAccountService {
+	s.subAccountId = subAccountId
+	return s
+}
+
+func (s *AddIPRestrictionForSubAccountService) SubAccountApiKey(subAccountApiKey string) *AddIPRestrictionForSubAccountService {
+	s.subAccountApiKey = subAccountApiKey
+	return s
+}
+
+func (s *AddIPRestrictionForSubAccountService) IPAddress(ipAddress string) *AddIPRestrictionForSubAccountService {
+	s.ipAddress = ipAddress
+	return s
+}
+
+func (s *AddIPRestrictionForSubAccountService) Do(ctx context.Context, opts ...RequestOption) (res *AddIPRestrictionForSubAccountResponse, err error) {
+	r := &request{
+		method:   "POST",
+		endpoint: "/sapi/v1/broker/subAccountApi/ipRestriction/ipList",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"subAccountId":     s.subAccountId,
+		"subAccountApiKey": s.subAccountApiKey,
+		"ipAddress":        s.ipAddress,
+	}
+	r.setFormParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(AddIPRestrictionForSubAccountResponse)
+	err = json.Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *IPRestrictionForSubAccountService) SubAccountId(subAccountId string) *IPRestrictionForSubAccountService {
+	s.subAccountId = subAccountId
+	return s
+}
+
+func (s *IPRestrictionForSubAccountService) SubAccountApiKey(subAccountApiKey string) *IPRestrictionForSubAccountService {
+	s.subAccountApiKey = subAccountApiKey
+	return s
+}
+
+func (s *IPRestrictionForSubAccountService) IPRestrict(ipRestrict bool) *IPRestrictionForSubAccountService {
+	s.ipRestrict = ipRestrict
+	return s
+}
+
+func (s *IPRestrictionForSubAccountService) Do(ctx context.Context, opts ...RequestOption) (res *IPRestrictionForSubAccountResponse, err error) {
+	r := &request{
+		method:   "POST",
+		endpoint: "/sapi/v1/broker/subAccountApi/ipRestriction",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"subAccountId":     s.subAccountId,
+		"subAccountApiKey": s.subAccountApiKey,
+		"ipRestrict":       s.ipRestrict,
+	}
+	r.setFormParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(IPRestrictionForSubAccountResponse)
 	err = json.Unmarshal(data, res)
 	if err != nil {
 		return nil, err

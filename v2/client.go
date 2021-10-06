@@ -640,6 +640,16 @@ func (c *Client) NewEnableFuturesForSubAccountService() *EnableFuturesForSubAcco
 	return &EnableFuturesForSubAccountService{c: c}
 }
 
+// NewAddIPRestrictionForSubAccountService init add ip restriction subaccount service
+func (c *Client) NewAddIPRestrictionForSubAccountService() *AddIPRestrictionForSubAccountService {
+	return &AddIPRestrictionForSubAccountService{c: c}
+}
+
+// NewIPRestrictionForSubAccountService init ip restriction subaccount service
+func (c *Client) NewIPRestrictionForSubAccountService() *IPRestrictionForSubAccountService {
+	return &IPRestrictionForSubAccountService{c: c}
+}
+
 // NewCreateSubAccountApiKeyService init creating subaccount API key service
 func (c *Client) NewCreateSubAccountApiKeyService() *CreateSubAccountApiKeyService {
 	return &CreateSubAccountApiKeyService{c: c}
