@@ -664,3 +664,13 @@ func (c *Client) NewDeleteSubAccountApiKeyService() *DeleteSubAccountApiKeyServi
 func (c *Client) NewListSubAccountsService() *ListSubAccountsService {
 	return &ListSubAccountsService{c: c}
 }
+
+// NewUniversalTransferService init universal transfer service
+func (c *Client) NewUniversalTransferService() *UniversalTransferService {
+	return &UniversalTransferService{c: c}
+}
+
+// NewUniversalTransferHistoryService init list universal transfers service
+func (c *Client) NewUniversalTransferHistoryService() *UniversalTransferHistoryService {
+	return &UniversalTransferHistoryService{c: c}
+}

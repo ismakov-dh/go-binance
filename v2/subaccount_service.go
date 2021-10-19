@@ -52,14 +52,14 @@ type (
 		CreateTime            int64  `json:"createTime"`
 	}
 	EnableMarginForSubAccountService struct {
-		c   *Client
+		c            *Client
 		subAccountId string
-		margin bool
+		margin       bool
 	}
 	EnableFuturesForSubAccountService struct {
-		c   *Client
+		c            *Client
 		subAccountId string
-		futures bool
+		futures      bool
 	}
 	EnableMarginForSubAccountResponse struct {
 		SubAccountId string `json:"subaccountId"`
@@ -72,10 +72,10 @@ type (
 		UpdateTime    int64  `json:"updateTime"`
 	}
 	AddIPRestrictionForSubAccountService struct {
-		c   *Client
-		subAccountId string
+		c                *Client
+		subAccountId     string
 		subAccountApiKey string
-		ipAddress string
+		ipAddress        string
 	}
 	AddIPRestrictionForSubAccountResponse struct {
 		SubAccountId string `json:"subaccountId"`
@@ -84,10 +84,10 @@ type (
 		UpdateTime   int64  `json:"updateTime"`
 	}
 	IPRestrictionForSubAccountService struct {
-		c   *Client
-		subAccountId string
+		c                *Client
+		subAccountId     string
 		subAccountApiKey string
-		ipRestrict bool
+		ipRestrict       bool
 	}
 	IPRestrictionForSubAccountResponse struct {
 		SubAccountId string   `json:"subaccountId"`
@@ -95,6 +95,43 @@ type (
 		Apikey       string   `json:"apikey"`
 		IpList       []string `json:"ipList"`
 		UpdateTime   int64    `json:"updateTime"`
+	}
+	UniversalTransferService struct {
+		c               *Client
+		fromAccountType string
+		toAccountType   string
+		asset           string
+		amount          float64
+		fromId          *string
+		toId            *string
+		clientTranId    *string
+	}
+	UniversalTransferResponse struct {
+		TxnId        int64  `json:"txnId"`
+		ClientTranId string `json:"clientTranId"`
+	}
+	UniversalTransferHistoryService struct {
+		c             *Client
+		fromId        *string
+		toId          *string
+		clientTranId  *string
+		startTime     *int64
+		endTime       *int64
+		page          *int32
+		limit         *int32
+		showAllStatus *bool
+	}
+	UniversalTransfer struct {
+		FromId          string `json:"fromId,omitempty"`
+		ToId            string `json:"toId,omitempty"`
+		Asset           string `json:"asset"`
+		Qty             string `json:"qty"`
+		Time            int64  `json:"time"`
+		Status          string `json:"status"`
+		TxnId           string `json:"txnId"`
+		ClientTranId    string `json:"clientTranId"`
+		FromAccountType string `json:"fromAccountType"`
+		ToAccountType   string `json:"toAccountType"`
 	}
 )
 
@@ -407,6 +444,145 @@ func (s *IPRestrictionForSubAccountService) Do(ctx context.Context, opts ...Requ
 	err = json.Unmarshal(data, res)
 	if err != nil {
 		return nil, err
+	}
+	return res, nil
+}
+
+func (s *UniversalTransferService) FromAccountType(fromAccountType string) *UniversalTransferService {
+	s.fromAccountType = fromAccountType
+	return s
+}
+func (s *UniversalTransferService) ToAccountType(toAccountType string) *UniversalTransferService {
+	s.toAccountType = toAccountType
+	return s
+}
+func (s *UniversalTransferService) Asset(asset string) *UniversalTransferService {
+	s.asset = asset
+	return s
+}
+func (s *UniversalTransferService) Amount(amount float64) *UniversalTransferService {
+	s.amount = amount
+	return s
+}
+func (s *UniversalTransferService) FromId(fromId string) *UniversalTransferService {
+	s.fromId = &fromId
+	return s
+}
+func (s *UniversalTransferService) ToId(toId string) *UniversalTransferService {
+	s.toId = &toId
+	return s
+}
+func (s *UniversalTransferService) ClientTranId(clientTranId string) *UniversalTransferService {
+	s.clientTranId = &clientTranId
+	return s
+}
+
+func (s *UniversalTransferService) Do(ctx context.Context, opts ...RequestOption) (res *UniversalTransferResponse, err error) {
+	r := &request{
+		method:   "POST",
+		endpoint: "/sapi/v1/broker/universalTransfer",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"fromAccountType": s.fromAccountType,
+		"toAccountType":   s.toAccountType,
+		"asset":           s.asset,
+		"amount":          s.amount,
+	}
+	r.setFormParams(m)
+	if s.clientTranId != nil {
+		r.setParam("clientTranId", *s.clientTranId)
+	}
+	if s.fromId != nil {
+		r.setParam("fromId", *s.fromId)
+	}
+	if s.toId != nil {
+		r.setParam("toId", *s.toId)
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(UniversalTransferResponse)
+	err = json.Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s *UniversalTransferHistoryService) FromId(fromId string) *UniversalTransferHistoryService {
+	s.fromId = &fromId
+	return s
+}
+func (s *UniversalTransferHistoryService) ToId(toId string) *UniversalTransferHistoryService {
+	s.toId = &toId
+	return s
+}
+func (s *UniversalTransferHistoryService) ClientTranId(clientTranId string) *UniversalTransferHistoryService {
+	s.clientTranId = &clientTranId
+	return s
+}
+func (s *UniversalTransferHistoryService) StartTime(startTime int64) *UniversalTransferHistoryService {
+	s.startTime = &startTime
+	return s
+}
+func (s *UniversalTransferHistoryService) EndTime(endTime int64) *UniversalTransferHistoryService {
+	s.endTime = &endTime
+	return s
+}
+func (s *UniversalTransferHistoryService) Page(page int32) *UniversalTransferHistoryService {
+	s.page = &page
+	return s
+}
+func (s *UniversalTransferHistoryService) Limit(limit int32) *UniversalTransferHistoryService {
+	s.limit = &limit
+	return s
+}
+func (s *UniversalTransferHistoryService) ShowAllStatus(showAllStatus bool) *UniversalTransferHistoryService {
+	s.showAllStatus = &showAllStatus
+	return s
+}
+
+func (s *UniversalTransferHistoryService) Do(ctx context.Context, opts ...RequestOption) (res []*UniversalTransfer, err error) {
+	r := &request{
+		method:   "GET",
+		endpoint: "/sapi/v1/broker/universalTransfer",
+		secType:  secTypeSigned,
+	}
+	if s.fromId != nil {
+		r.setParam("fromId", *s.fromId)
+	}
+	if s.toId != nil {
+		r.setParam("toId", *s.toId)
+	}
+	if s.clientTranId != nil {
+		r.setParam("clientTranId", *s.clientTranId)
+	}
+	if s.startTime != nil {
+		r.setParam("startTime", *s.startTime)
+	}
+	if s.endTime != nil {
+		r.setParam("endTime", *s.endTime)
+	}
+	if s.showAllStatus != nil {
+		r.setParam("showAllStatus", *s.showAllStatus)
+	}
+	if s.page != nil {
+		r.setParam("page", *s.page)
+	}
+	if s.limit != nil {
+		r.setParam("limit", *s.limit)
+	}
+
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return []*UniversalTransfer{}, err
+	}
+	res = make([]*UniversalTransfer, 0)
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return []*UniversalTransfer{}, err
 	}
 	return res, nil
 }
