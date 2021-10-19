@@ -128,7 +128,7 @@ type (
 		Qty             string `json:"qty"`
 		Time            int64  `json:"time"`
 		Status          string `json:"status"`
-		TxnId           string `json:"txnId"`
+		TxnId           int64  `json:"txnId"`
 		ClientTranId    string `json:"clientTranId"`
 		FromAccountType string `json:"fromAccountType"`
 		ToAccountType   string `json:"toAccountType"`
