@@ -244,7 +244,7 @@ func (c *Client) parseRequest(r *request, opts ...RequestOption) (err error) {
 		body = bytes.NewBufferString(bodyString)
 	}
 	if r.secType == secTypeAPIKey || r.secType == secTypeSigned {
-		header.Set("X-MBX-APIKEY", c.APIKey)
+		header["X-MBX-APIKEY"] = []string{c.APIKey}
 	}
 
 	if r.secType == secTypeSigned {
