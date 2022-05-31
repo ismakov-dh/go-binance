@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -210,6 +211,28 @@ func NewClient(apiKey, secretKey string) *Client {
 	}
 }
 
+//NewProxiedClient passing a proxy url
+func NewProxiedClient(apiKey, secretKey, proxyUrl string) *Client {
+	proxy, err := url.Parse(proxyUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	tr := &http.Transport{
+		Proxy:           http.ProxyURL(proxy),
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	return &Client{
+		APIKey:    apiKey,
+		SecretKey: secretKey,
+		BaseURL:   getApiEndpoint(),
+		UserAgent: "Binance/golang",
+		HTTPClient: &http.Client{
+			Transport: tr,
+		},
+		Logger: log.New(os.Stderr, "Binance-golang ", log.LstdFlags),
+	}
+}
+
 type doFunc func(req *http.Request) (*http.Response, error)
 
 // Client define API client
@@ -289,14 +312,14 @@ func (c *Client) parseRequest(r *request, opts ...RequestOption) (err error) {
 	return nil
 }
 
-func (c *Client) callAPI(ctx context.Context, r *request, opts ...RequestOption) (data []byte, err error) {
+func (c *Client) callAPI(ctx context.Context, r *request, opts ...RequestOption) (data []byte, header *http.Header, err error) {
 	err = c.parseRequest(r, opts...)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, &http.Header{}, err
 	}
 	req, err := http.NewRequest(r.method, r.fullURL, r.body)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, &http.Header{}, err
 	}
 	req = req.WithContext(ctx)
 	req.Header = r.header
@@ -307,11 +330,11 @@ func (c *Client) callAPI(ctx context.Context, r *request, opts ...RequestOption)
 	}
 	res, err := f(req)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, &http.Header{}, err
 	}
 	data, err = ioutil.ReadAll(res.Body)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, &http.Header{}, err
 	}
 	defer func() {
 		cerr := res.Body.Close()
@@ -325,15 +348,15 @@ func (c *Client) callAPI(ctx context.Context, r *request, opts ...RequestOption)
 	c.debug("response body: %s", string(data))
 	c.debug("response status code: %d", res.StatusCode)
 
-	if res.StatusCode >= 400 {
+	if res.StatusCode >= http.StatusBadRequest {
 		apiErr := new(common.APIError)
 		e := json.Unmarshal(data, apiErr)
 		if e != nil {
 			c.debug("failed to unmarshal json: %s", e)
 		}
-		return nil, apiErr
+		return nil, &http.Header{}, apiErr
 	}
-	return data, nil
+	return data, &res.Header, nil
 }
 
 // NewPingService init ping service
@@ -389,6 +412,11 @@ func (c *Client) NewListBookTickersService() *ListBookTickersService {
 // NewCreateOrderService init creating order service
 func (c *Client) NewCreateOrderService() *CreateOrderService {
 	return &CreateOrderService{c: c}
+}
+
+// NewCreateBatchOrderService init creating batch order service
+func (c *Client) NewCreateBatchOrdersService() *CreateBatchOrdersService {
+	return &CreateBatchOrdersService{c: c}
 }
 
 // NewGetOrderService init get order service

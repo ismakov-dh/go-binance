@@ -2,7 +2,7 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
+	"net/http"
 	"strings"
 )
 
@@ -35,7 +35,7 @@ func (s *MarginTransferService) Type(transferType MarginTransferType) *MarginTra
 // Do send request
 func (s *MarginTransferService) Do(ctx context.Context, opts ...RequestOption) (res *TransactionResponse, err error) {
 	r := &request{
-		method:   "POST",
+		method:   http.MethodPost,
 		endpoint: "/sapi/v1/margin/transfer",
 		secType:  secTypeSigned,
 	}
@@ -64,10 +64,11 @@ type TransactionResponse struct {
 
 // MarginLoanService apply for a loan
 type MarginLoanService struct {
-	c              *Client
-	asset          string
-	amount         string
-	isolatedSymbol string
+	c          *Client
+	asset      string
+	amount     string
+	isIsolated bool
+	symbol     *string
 }
 
 // Asset set asset being transferred, e.g., BTC
@@ -82,16 +83,22 @@ func (s *MarginLoanService) Amount(amount string) *MarginLoanService {
 	return s
 }
 
-// IsolatedSymbol set IsolatedSymbol
-func (s *MarginLoanService) IsolatedSymbol(isolatedSymbol string) *MarginLoanService {
-	s.isolatedSymbol = isolatedSymbol
+// IsIsolated is for isolated margin or not, "TRUE", "FALSE"，default "FALSE"
+func (s *MarginLoanService) IsIsolated(isIsolated bool) *MarginLoanService {
+	s.isIsolated = isIsolated
+	return s
+}
+
+// Symbol set isolated symbol
+func (s *MarginLoanService) Symbol(symbol string) *MarginLoanService {
+	s.symbol = &symbol
 	return s
 }
 
 // Do send request
 func (s *MarginLoanService) Do(ctx context.Context, opts ...RequestOption) (res *TransactionResponse, err error) {
 	r := &request{
-		method:   "POST",
+		method:   http.MethodPost,
 		endpoint: "/sapi/v1/margin/loan",
 		secType:  secTypeSigned,
 	}
@@ -100,9 +107,13 @@ func (s *MarginLoanService) Do(ctx context.Context, opts ...RequestOption) (res 
 		"amount": s.amount,
 	}
 	r.setFormParams(m)
-	if s.isolatedSymbol != "" {
-		r.setParam("isolatedSymbol", s.isolatedSymbol)
+	if s.isIsolated {
+		r.setParam("isIsolated", "TRUE")
 	}
+	if s.symbol != nil {
+		r.setParam("symbol", *s.symbol)
+	}
+
 	res = new(TransactionResponse)
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
@@ -117,10 +128,11 @@ func (s *MarginLoanService) Do(ctx context.Context, opts ...RequestOption) (res 
 
 // MarginRepayService repay loan for margin account
 type MarginRepayService struct {
-	c              *Client
-	asset          string
-	amount         string
-	isolatedSymbol string
+	c          *Client
+	asset      string
+	amount     string
+	isIsolated bool
+	symbol     *string
 }
 
 // Asset set asset being transferred, e.g., BTC
@@ -135,16 +147,22 @@ func (s *MarginRepayService) Amount(amount string) *MarginRepayService {
 	return s
 }
 
-// IsolatedSymbol set IsolatedSymbol
-func (s *MarginRepayService) IsolatedSymbol(isolatedSymbol string) *MarginRepayService {
-	s.isolatedSymbol = isolatedSymbol
+// IsIsolated is for isolated margin or not, "TRUE", "FALSE"，default "FALSE"
+func (s *MarginRepayService) IsIsolated(isIsolated bool) *MarginRepayService {
+	s.isIsolated = isIsolated
+	return s
+}
+
+// Symbol set isolated symbol
+func (s *MarginRepayService) Symbol(symbol string) *MarginRepayService {
+	s.symbol = &symbol
 	return s
 }
 
 // Do send request
 func (s *MarginRepayService) Do(ctx context.Context, opts ...RequestOption) (res *TransactionResponse, err error) {
 	r := &request{
-		method:   "POST",
+		method:   http.MethodPost,
 		endpoint: "/sapi/v1/margin/repay",
 		secType:  secTypeSigned,
 	}
@@ -153,9 +171,13 @@ func (s *MarginRepayService) Do(ctx context.Context, opts ...RequestOption) (res
 		"amount": s.amount,
 	}
 	r.setFormParams(m)
-	if s.isolatedSymbol != "" {
-		r.setParam("isolatedSymbol", s.isolatedSymbol)
+	if s.isIsolated {
+		r.setParam("isIsolated", "TRUE")
 	}
+	if s.symbol != nil {
+		r.setParam("symbol", *s.symbol)
+	}
+
 	res = new(TransactionResponse)
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
@@ -218,7 +240,7 @@ func (s *ListMarginLoansService) Size(size int64) *ListMarginLoansService {
 // Do send request
 func (s *ListMarginLoansService) Do(ctx context.Context, opts ...RequestOption) (res *MarginLoanResponse, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/loan",
 		secType:  secTypeSigned,
 	}
@@ -314,7 +336,7 @@ func (s *ListMarginRepaysService) Size(size int64) *ListMarginRepaysService {
 // Do send request
 func (s *ListMarginRepaysService) Do(ctx context.Context, opts ...RequestOption) (res *MarginRepayResponse, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/repay",
 		secType:  secTypeSigned,
 	}
@@ -379,7 +401,7 @@ func (s *GetIsolatedMarginAccountService) Symbols(symbols ...string) *GetIsolate
 // Do send request
 func (s *GetIsolatedMarginAccountService) Do(ctx context.Context, opts ...RequestOption) (res *IsolatedMarginAccount, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/isolated/account",
 		secType:  secTypeSigned,
 	}
@@ -447,7 +469,7 @@ type GetMarginAccountService struct {
 // Do send request
 func (s *GetMarginAccountService) Do(ctx context.Context, opts ...RequestOption) (res *MarginAccount, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/account",
 		secType:  secTypeSigned,
 	}
@@ -500,7 +522,7 @@ func (s *GetMarginAssetService) Asset(asset string) *GetMarginAssetService {
 // Do send request
 func (s *GetMarginAssetService) Do(ctx context.Context, opts ...RequestOption) (res *MarginAsset, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/asset",
 		secType:  secTypeAPIKey,
 	}
@@ -542,7 +564,7 @@ func (s *GetMarginPairService) Symbol(symbol string) *GetMarginPairService {
 // Do send request
 func (s *GetMarginPairService) Do(ctx context.Context, opts ...RequestOption) (res *MarginPair, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/pair",
 		secType:  secTypeAPIKey,
 	}
@@ -578,7 +600,7 @@ type GetMarginAllPairsService struct {
 // Do send request
 func (s *GetMarginAllPairsService) Do(ctx context.Context, opts ...RequestOption) (res []*MarginAllPair, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/allPairs",
 		secType:  secTypeAPIKey,
 	}
@@ -620,7 +642,7 @@ func (s *GetMarginPriceIndexService) Symbol(symbol string) *GetMarginPriceIndexS
 // Do send request
 func (s *GetMarginPriceIndexService) Do(ctx context.Context, opts ...RequestOption) (res *MarginPriceIndex, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/priceIndex",
 		secType:  secTypeAPIKey,
 	}
@@ -694,7 +716,7 @@ func (s *ListMarginTradesService) FromID(fromID int64) *ListMarginTradesService 
 // Do send request
 func (s *ListMarginTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*TradeV3, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/myTrades",
 		secType:  secTypeSigned,
 	}
@@ -728,8 +750,9 @@ func (s *ListMarginTradesService) Do(ctx context.Context, opts ...RequestOption)
 
 // GetMaxBorrowableService get max borrowable of asset
 type GetMaxBorrowableService struct {
-	c     *Client
-	asset string
+	c              *Client
+	asset          string
+	isolatedSymbol string
 }
 
 // Asset set asset
@@ -738,14 +761,23 @@ func (s *GetMaxBorrowableService) Asset(asset string) *GetMaxBorrowableService {
 	return s
 }
 
+// IsolatedSymbol set isolatedSymbol
+func (s *GetMaxBorrowableService) IsolatedSymbol(isolatedSymbol string) *GetMaxBorrowableService {
+	s.isolatedSymbol = isolatedSymbol
+	return s
+}
+
 // Do send request
 func (s *GetMaxBorrowableService) Do(ctx context.Context, opts ...RequestOption) (res *MaxBorrowable, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/maxBorrowable",
 		secType:  secTypeSigned,
 	}
 	r.setParam("asset", s.asset)
+	if s.isolatedSymbol != "" {
+		r.setParam("isolatedSymbol", s.isolatedSymbol)
+	}
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
 		return nil, err
@@ -778,7 +810,7 @@ func (s *GetMaxTransferableService) Asset(asset string) *GetMaxTransferableServi
 // Do send request
 func (s *GetMaxTransferableService) Do(ctx context.Context, opts ...RequestOption) (res *MaxTransferable, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/margin/maxTransferable",
 		secType:  secTypeSigned,
 	}
@@ -815,7 +847,7 @@ func (s *StartIsolatedMarginUserStreamService) Symbol(symbol string) *StartIsola
 // Do send request
 func (s *StartIsolatedMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (listenKey string, err error) {
 	r := &request{
-		method:   "POST",
+		method:   http.MethodPost,
 		endpoint: "/sapi/v1/userDataStream/isolated",
 		secType:  secTypeAPIKey,
 	}
@@ -856,7 +888,7 @@ func (s *KeepaliveIsolatedMarginUserStreamService) ListenKey(listenKey string) *
 // Do send request
 func (s *KeepaliveIsolatedMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
 	r := &request{
-		method:   "PUT",
+		method:   http.MethodPut,
 		endpoint: "/sapi/v1/userDataStream/isolated",
 		secType:  secTypeAPIKey,
 	}
@@ -890,7 +922,7 @@ func (s *CloseIsolatedMarginUserStreamService) Symbol(symbol string) *CloseIsola
 // Do send request
 func (s *CloseIsolatedMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
 	r := &request{
-		method:   "DELETE",
+		method:   http.MethodDelete,
 		endpoint: "/sapi/v1/userDataStream/isolated",
 		secType:  secTypeAPIKey,
 	}
@@ -910,7 +942,7 @@ type StartMarginUserStreamService struct {
 // Do send request
 func (s *StartMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (listenKey string, err error) {
 	r := &request{
-		method:   "POST",
+		method:   http.MethodPost,
 		endpoint: "/sapi/v1/userDataStream",
 		secType:  secTypeAPIKey,
 	}
@@ -942,7 +974,7 @@ func (s *KeepaliveMarginUserStreamService) ListenKey(listenKey string) *Keepaliv
 // Do send request
 func (s *KeepaliveMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
 	r := &request{
-		method:   "PUT",
+		method:   http.MethodPut,
 		endpoint: "/sapi/v1/userDataStream",
 		secType:  secTypeAPIKey,
 	}
@@ -966,7 +998,7 @@ func (s *CloseMarginUserStreamService) ListenKey(listenKey string) *CloseMarginU
 // Do send request
 func (s *CloseMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
 	r := &request{
-		method:   "DELETE",
+		method:   http.MethodDelete,
 		endpoint: "/sapi/v1/userDataStream",
 		secType:  secTypeAPIKey,
 	}
@@ -975,4 +1007,62 @@ func (s *CloseMarginUserStreamService) Do(ctx context.Context, opts ...RequestOp
 
 	_, err = s.c.callAPI(ctx, r, opts...)
 	return err
+}
+
+// GetAllMarginAssetsService get margin pair info
+type GetAllMarginAssetsService struct {
+	c *Client
+}
+
+// Do send request
+func (s *GetAllMarginAssetsService) Do(ctx context.Context, opts ...RequestOption) (res []*MarginAsset, err error) {
+	r := &request{
+		method:   "GET",
+		endpoint: "/sapi/v1/margin/allAssets",
+		secType:  secTypeAPIKey,
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return []*MarginAsset{}, err
+	}
+	res = make([]*MarginAsset, 0)
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return []*MarginAsset{}, err
+	}
+	return res, nil
+}
+
+// GetIsolatedMarginAllPairsService get isolated margin pair info
+type GetIsolatedMarginAllPairsService struct {
+	c *Client
+}
+
+// Do send request
+func (s *GetIsolatedMarginAllPairsService) Do(ctx context.Context, opts ...RequestOption) (res []*IsolatedMarginAllPair, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/sapi/v1/margin/isolated/allPairs",
+		secType:  secTypeAPIKey,
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return []*IsolatedMarginAllPair{}, err
+	}
+	res = make([]*IsolatedMarginAllPair, 0)
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return []*IsolatedMarginAllPair{}, err
+	}
+	return res, nil
+}
+
+// IsolatedMarginAllPair define isolated margin pair info
+type IsolatedMarginAllPair struct {
+	Symbol        string `json:"symbol"`
+	Base          string `json:"base"`
+	Quote         string `json:"quote"`
+	IsMarginTrade bool   `json:"isMarginTrade"`
+	IsBuyAllowed  bool   `json:"isBuyAllowed"`
+	IsSellAllowed bool   `json:"isSellAllowed"`
 }

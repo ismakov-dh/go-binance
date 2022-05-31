@@ -2,7 +2,7 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
+	"net/http"
 )
 
 // ListDepositsService fetches deposit history.
@@ -59,7 +59,7 @@ func (s *ListDepositsService) Limit(limit int) *ListDepositsService {
 // Do sends the request.
 func (s *ListDepositsService) Do(ctx context.Context) (res []*Deposit, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/capital/deposit/hisrec",
 		secType:  secTypeSigned,
 	}
@@ -96,16 +96,17 @@ func (s *ListDepositsService) Do(ctx context.Context) (res []*Deposit, err error
 
 // Deposit represents a single deposit entry.
 type Deposit struct {
-	Amount       string `json:"amount"`
-	Coin         string `json:"coin"`
-	Network      string `json:"network"`
-	Status       int    `json:"status"`
-	Address      string `json:"address"`
-	AddressTag   string `json:"addressTag"`
-	TxID         string `json:"txId"`
-	InsertTime   int64  `json:"insertTime"`
-	TransferType int64  `json:"transferType"`
-	ConfirmTimes string `json:"confirmTimes"`
+	Amount        string `json:"amount"`
+	Coin          string `json:"coin"`
+	Network       string `json:"network"`
+	Status        int    `json:"status"`
+	Address       string `json:"address"`
+	AddressTag    string `json:"addressTag"`
+	TxID          string `json:"txId"`
+	InsertTime    int64  `json:"insertTime"`
+	TransferType  int64  `json:"transferType"`
+	UnlockConfirm string `json:"unlockConfirm"`
+	ConfirmTimes  string `json:"confirmTimes"`
 }
 
 // GetDepositsAddressService retrieves the details of a deposit address.
@@ -132,7 +133,7 @@ func (s *GetDepositsAddressService) Network(network string) *GetDepositsAddressS
 // Do sends the request.
 func (s *GetDepositsAddressService) Do(ctx context.Context) (*GetDepositAddressResponse, error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/sapi/v1/capital/deposit/address",
 		secType:  secTypeSigned,
 	}

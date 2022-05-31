@@ -2,7 +2,8 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
+	stdjson "encoding/json"
+	"net/http"
 )
 
 // CreateOrderService create order
@@ -89,7 +90,7 @@ func (s *CreateOrderService) NewOrderRespType(newOrderRespType NewOrderRespType)
 
 func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, opts ...RequestOption) (data []byte, err error) {
 	r := &request{
-		method:   "POST",
+		method:   http.MethodPost,
 		endpoint: endpoint,
 		secType:  secTypeSigned,
 	}
@@ -175,6 +176,7 @@ type CreateOrderResponse struct {
 
 // Fill may be returned in an array of fills in a CreateOrderResponse.
 type Fill struct {
+	TradeID         int    `json:"tradeId"`
 	Price           string `json:"price"`
 	Quantity        string `json:"qty"`
 	Commission      string `json:"commission"`
@@ -235,8 +237,8 @@ func (s *CreateOCOService) Price(price string) *CreateOCOService {
 	return s
 }
 
-// limitIcebergQuantity set limitIcebergQuantity
-func (s *CreateOCOService) limitIcebergQuantity(limitIcebergQty string) *CreateOCOService {
+// LimitIcebergQuantity set limitIcebergQuantity
+func (s *CreateOCOService) LimitIcebergQuantity(limitIcebergQty string) *CreateOCOService {
 	s.limitIcebergQty = &limitIcebergQty
 	return s
 }
@@ -279,7 +281,7 @@ func (s *CreateOCOService) NewOrderRespType(newOrderRespType NewOrderRespType) *
 
 func (s *CreateOCOService) createOrder(ctx context.Context, endpoint string, opts ...RequestOption) (data []byte, err error) {
 	r := &request{
-		method:   "POST",
+		method:   http.MethodPost,
 		endpoint: endpoint,
 		secType:  secTypeSigned,
 	}
@@ -377,6 +379,42 @@ type OCOOrderReport struct {
 	IcebergQuantity          string          `json:"icebergQty"`
 }
 
+// ListOpenOcoService list opened oco
+type ListOpenOcoService struct {
+	c *Client
+}
+
+// oco define oco info
+type Oco struct {
+	Symbol            string   `json:"symbol"`
+	OrderListId       int64    `json:"orderListId"`
+	ContingencyType   string   `json:"contingencyType"`
+	ListStatusType    string   `json:"listStatusType"`
+	ListOrderStatus   string   `json:"listOrderStatus"`
+	ListClientOrderID string   `json:"listClientOrderId"`
+	TransactionTime   int64    `json:"transactionTime"`
+	Orders            []*Order `json:"orders"`
+}
+
+// Do send request
+func (s *ListOpenOcoService) Do(ctx context.Context, opts ...RequestOption) (res []*Oco, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/api/v3/openOrderList ",
+		secType:  secTypeSigned,
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return []*Oco{}, err
+	}
+	res = make([]*Oco, 0)
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return []*Oco{}, err
+	}
+	return res, nil
+}
+
 // ListOpenOrdersService list opened orders
 type ListOpenOrdersService struct {
 	c      *Client
@@ -392,7 +430,7 @@ func (s *ListOpenOrdersService) Symbol(symbol string) *ListOpenOrdersService {
 // Do send request
 func (s *ListOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/api/v3/openOrders",
 		secType:  secTypeSigned,
 	}
@@ -440,7 +478,7 @@ func (s *GetOrderService) OrigClientOrderID(origClientOrderID string) *GetOrderS
 // Do send request
 func (s *GetOrderService) Do(ctx context.Context, opts ...RequestOption) (res *Order, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/api/v3/order",
 		secType:  secTypeSigned,
 	}
@@ -467,6 +505,7 @@ func (s *GetOrderService) Do(ctx context.Context, opts ...RequestOption) (res *O
 type Order struct {
 	Symbol                   string          `json:"symbol"`
 	OrderID                  int64           `json:"orderId"`
+	OrderListId              int64           `json:"orderListId"`
 	ClientOrderID            string          `json:"clientOrderId"`
 	Price                    string          `json:"price"`
 	OrigQuantity             string          `json:"origQty"`
@@ -482,6 +521,7 @@ type Order struct {
 	UpdateTime               int64           `json:"updateTime"`
 	IsWorking                bool            `json:"isWorking"`
 	IsIsolated               bool            `json:"isIsolated"`
+	OrigQuoteOrderQuantity   string          `json:"origQuoteOrderQty"`
 }
 
 // ListOrdersService all account orders; active, canceled, or filled
@@ -527,7 +567,7 @@ func (s *ListOrdersService) Limit(limit int) *ListOrdersService {
 // Do send request
 func (s *ListOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
 	r := &request{
-		method:   "GET",
+		method:   http.MethodGet,
 		endpoint: "/api/v3/allOrders",
 		secType:  secTypeSigned,
 	}
@@ -592,7 +632,7 @@ func (s *CancelOrderService) NewClientOrderID(newClientOrderID string) *CancelOr
 // Do send request
 func (s *CancelOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CancelOrderResponse, err error) {
 	r := &request{
-		method:   "DELETE",
+		method:   http.MethodDelete,
 		endpoint: "/api/v3/order",
 		secType:  secTypeSigned,
 	}
@@ -654,7 +694,7 @@ func (s *CancelOCOService) NewClientOrderID(newClientOrderID string) *CancelOCOS
 // Do send request
 func (s *CancelOCOService) Do(ctx context.Context, opts ...RequestOption) (res *CancelOCOResponse, err error) {
 	r := &request{
-		method:   "DELETE",
+		method:   http.MethodDelete,
 		endpoint: "/api/v3/orderList",
 		secType:  secTypeSigned,
 	}
@@ -695,7 +735,7 @@ func (s *CancelOpenOrdersService) Symbol(symbol string) *CancelOpenOrdersService
 // Do send request
 func (s *CancelOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (res *CancelOpenOrdersResponse, err error) {
 	r := &request{
-		method:   "DELETE",
+		method:   http.MethodDelete,
 		endpoint: "/api/v3/openOrders",
 		secType:  secTypeSigned,
 	}
@@ -704,7 +744,7 @@ func (s *CancelOpenOrdersService) Do(ctx context.Context, opts ...RequestOption)
 	if err != nil {
 		return &CancelOpenOrdersResponse{}, err
 	}
-	rawMessages := make([]*json.RawMessage, 0)
+	rawMessages := make([]*stdjson.RawMessage, 0)
 	err = json.Unmarshal(data, &rawMessages)
 	if err != nil {
 		return &CancelOpenOrdersResponse{}, err
