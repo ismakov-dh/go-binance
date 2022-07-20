@@ -694,6 +694,11 @@ func (c *Client) NewCloseIsolatedMarginUserStreamService() *CloseIsolatedMarginU
 	return &CloseIsolatedMarginUserStreamService{c: c}
 }
 
+// NewGetFuturesAccountService init futures account service
+func (c *Client) NewGetFuturesAccountService() *GetFuturesAccountService {
+	return &GetFuturesAccountService{c: c}
+}
+
 // NewFuturesTransferService init futures transfer service
 func (c *Client) NewFuturesTransferService() *FuturesTransferService {
 	return &FuturesTransferService{c: c}
