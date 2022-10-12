@@ -488,16 +488,16 @@ func (s *UniversalTransferService) Do(ctx context.Context, opts ...RequestOption
 		"asset":           s.asset,
 		"amount":          s.amount,
 	}
-	r.setFormParams(m)
 	if s.clientTranId != nil {
-		r.setParam("clientTranId", *s.clientTranId)
+		m["clientTranId"] = *s.clientTranId
 	}
 	if s.fromId != nil {
-		r.setParam("fromId", *s.fromId)
+		m["fromId"] = *s.fromId
 	}
 	if s.toId != nil {
-		r.setParam("toId", *s.toId)
+		m["toId"] = *s.toId
 	}
+	r.setFormParams(m)
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
 		return nil, err

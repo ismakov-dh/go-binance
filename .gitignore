@@ -1,4 +1,5 @@
 pkg/
 .idea
 *.iml
+.vscode
 /v2/vendor
