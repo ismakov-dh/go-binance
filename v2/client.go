@@ -72,6 +72,12 @@ type TransactionType string
 // LendingType define the type of lending (flexible saving, activity, ...)
 type LendingType string
 
+// StakingProductType define the staking product (locked staking, flexible defi staking, locked defi staking, ...)
+type StakingProductType string
+
+// StakingTransactionType define the staking transaction type (subscription, redemption, interest)
+type StakingTransactionType string
+
 // Endpoints
 const (
 	baseAPIMainURL    = "https://api.binance.com"
@@ -170,6 +176,14 @@ const (
 	timestampKey  = "timestamp"
 	signatureKey  = "signature"
 	recvWindowKey = "recvWindow"
+
+	StakingProductLockedStaking       = "STAKING"
+	StakingProductFlexibleDeFiStaking = "F_DEFI"
+	StakingProductLockedDeFiStaking   = "L_DEFI"
+
+	StakingTransactionTypeSubscription = "SUBSCRIPTION"
+	StakingTransactionTypeRedemption   = "REDEMPTION"
+	StakingTransactionTypeInterest     = "INTEREST"
 )
 
 func currentTimestamp() int64 {
@@ -211,7 +225,7 @@ func NewClient(apiKey, secretKey string) *Client {
 	}
 }
 
-//NewProxiedClient passing a proxy url
+// NewProxiedClient passing a proxy url
 func NewProxiedClient(apiKey, secretKey, proxyUrl string) *Client {
 	proxy, err := url.Parse(proxyUrl)
 	if err != nil {
@@ -827,4 +841,34 @@ func (c *Client) NewTradeFeeService() *TradeFeeService {
 // NewC2CTradeHistoryService init the c2c trade history service
 func (c *Client) NewC2CTradeHistoryService() *C2CTradeHistoryService {
 	return &C2CTradeHistoryService{c: c}
+}
+
+// NewStakingProductPositionService init the staking product position service
+func (c *Client) NewStakingProductPositionService() *StakingProductPositionService {
+	return &StakingProductPositionService{c: c}
+}
+
+// NewStakingHistoryService init the staking history service
+func (c *Client) NewStakingHistoryService() *StakingHistoryService {
+	return &StakingHistoryService{c: c}
+}
+
+// NewStakingProductListService ~.
+func (c *Client) NewStakingProductListService() *StakingProductListService {
+	return &StakingProductListService{c: c}
+}
+
+// NewPurchaseStakingProductService ~.
+func (c *Client) NewPurchaseStakingProductService() *PurchaseStakingProductService {
+	return &PurchaseStakingProductService{c: c}
+}
+
+// NewRedeemStakingProductService ~.
+func (c *Client) NewRedeemStakingProductService() *RedeemStakingProductService {
+	return &RedeemStakingProductService{c: c}
+}
+
+// NewStakingProductQuotaService ~.
+func (c *Client) NewStakingProductQuotaService() *StakingProductQuotaService {
+	return &StakingProductQuotaService{c: c}
 }
