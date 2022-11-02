@@ -872,3 +872,8 @@ func (c *Client) NewRedeemStakingProductService() *RedeemStakingProductService {
 func (c *Client) NewStakingProductQuotaService() *StakingProductQuotaService {
 	return &StakingProductQuotaService{c: c}
 }
+
+// NewSetAutoStakingService ~.
+func (c *Client) NewSetAutoStakingService() *SetAutoStakingService {
+	return &SetAutoStakingService{c: c}
+}

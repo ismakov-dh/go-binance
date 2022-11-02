@@ -459,3 +459,53 @@ type StakingProductPersonalQuotas []StakingProductPersonalQuota
 type StakingProductPersonalQuota struct {
 	LeftPersonalQuota string `json:"leftPersonalQuota"`
 }
+
+type SetAutoStakingService struct {
+	c          *Client
+	product    StakingProductType
+	positionId string
+	renewable  bool
+}
+
+func (s *SetAutoStakingService) Product(product StakingProductType) *SetAutoStakingService {
+	s.product = product
+	return s
+}
+
+func (s *SetAutoStakingService) PositionId(positionId string) *SetAutoStakingService {
+	s.positionId = positionId
+	return s
+}
+
+func (s *SetAutoStakingService) Renewable(renewable bool) *SetAutoStakingService {
+	s.renewable = renewable
+	return s
+}
+
+func (s *SetAutoStakingService) Do(ctx context.Context, opts ...RequestOption) (*SetAutoStakingResponse, error) {
+	r := &request{
+		method:   http.MethodPost,
+		endpoint: "/sapi/v1/staking/setAutoStaking",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"product":    s.product,
+		"positionId": s.positionId,
+		"renewable":  s.renewable,
+	}
+	r.setFormParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res := new(SetAutoStakingResponse)
+	err = json.Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type SetAutoStakingResponse struct {
+	Success bool `json:"success"`
+}
