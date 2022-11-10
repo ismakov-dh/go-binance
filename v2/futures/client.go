@@ -211,7 +211,7 @@ func NewClient(apiKey, secretKey string) *Client {
 	}
 }
 
-//NewProxiedClient passing a proxy url
+// NewProxiedClient passing a proxy url
 func NewProxiedClient(apiKey, secretKey, proxyUrl string) *Client {
 	proxy, err := url.Parse(proxyUrl)
 	if err != nil {
@@ -557,4 +557,9 @@ func (c *Client) NewGetPositionModeService() *GetPositionModeService {
 // NewGetRebateNewUserService init get rebate_newuser service
 func (c *Client) NewGetRebateNewUserService() *GetRebateNewUserService {
 	return &GetRebateNewUserService{c: c}
+}
+
+// NewTradeFeeService init the trade fee service
+func (c *Client) NewTradeFeeService() *TradeFeeService {
+	return &TradeFeeService{c: c}
 }
