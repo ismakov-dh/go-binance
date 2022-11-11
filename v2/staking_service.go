@@ -62,6 +62,9 @@ func (s *StakingProductPositionService) Do(ctx context.Context) (*StakingProduct
 	if s.productId != nil {
 		r.setParam("productId", *s.productId)
 	}
+	if s.positionId != nil {
+		r.setParam("positionId", *s.positionId)
+	}
 	if s.asset != nil {
 		r.setParam("asset", *s.asset)
 	}
