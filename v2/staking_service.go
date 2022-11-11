@@ -7,12 +7,13 @@ import (
 
 // StakingProductPositionService fetches the staking product positions
 type StakingProductPositionService struct {
-	c         *Client
-	product   StakingProductType
-	productId *string
-	asset     *string
-	current   *int32
-	size      *int32
+	c          *Client
+	product    StakingProductType
+	productId  *string
+	positionId *int64
+	asset      *string
+	current    *int32
+	size       *int32
 }
 
 // Product sets the product parameter.
@@ -24,6 +25,11 @@ func (s *StakingProductPositionService) Product(product StakingProductType) *Sta
 // ProductId sets the productId parameter.
 func (s *StakingProductPositionService) ProductId(productId string) *StakingProductPositionService {
 	s.productId = &productId
+	return s
+}
+
+func (s *StakingProductPositionService) PositionId(positionId int64) *StakingProductPositionService {
+	s.positionId = &positionId
 	return s
 }
 
@@ -55,6 +61,9 @@ func (s *StakingProductPositionService) Do(ctx context.Context) (*StakingProduct
 	r.setParam("product", s.product)
 	if s.productId != nil {
 		r.setParam("productId", *s.productId)
+	}
+	if s.positionId != nil {
+		r.setParam("positionId", *s.positionId)
 	}
 	if s.asset != nil {
 		r.setParam("asset", *s.asset)
