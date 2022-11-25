@@ -365,7 +365,7 @@ func (s *PurchaseStakingProductService) Do(ctx context.Context, opts ...RequestO
 
 type PurchaseStakingProductResponse struct {
 	PositionId int64 `json:"positionId"`
-	Success    bool   `json:"success"`
+	Success    bool  `json:"success"`
 }
 
 type RedeemStakingProductService struct {
