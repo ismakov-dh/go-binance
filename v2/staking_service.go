@@ -364,7 +364,7 @@ func (s *PurchaseStakingProductService) Do(ctx context.Context, opts ...RequestO
 }
 
 type PurchaseStakingProductResponse struct {
-	PositionId string `json:"positionId"`
+	PositionId int64 `json:"positionId"`
 	Success    bool   `json:"success"`
 }
 
@@ -372,7 +372,7 @@ type RedeemStakingProductService struct {
 	c          *Client
 	product    StakingProductType
 	productId  string
-	positionId *string
+	positionId *int64
 	amount     *string
 }
 
@@ -386,7 +386,7 @@ func (s *RedeemStakingProductService) ProductId(productId string) *RedeemStaking
 	return s
 }
 
-func (s *RedeemStakingProductService) PositionId(positionId string) *RedeemStakingProductService {
+func (s *RedeemStakingProductService) PositionId(positionId int64) *RedeemStakingProductService {
 	s.positionId = &positionId
 	return s
 }
@@ -472,7 +472,7 @@ type StakingProductPersonalQuota struct {
 type SetAutoStakingService struct {
 	c          *Client
 	product    StakingProductType
-	positionId string
+	positionId int64
 	renewable  bool
 }
 
@@ -481,7 +481,7 @@ func (s *SetAutoStakingService) Product(product StakingProductType) *SetAutoStak
 	return s
 }
 
-func (s *SetAutoStakingService) PositionId(positionId string) *SetAutoStakingService {
+func (s *SetAutoStakingService) PositionId(positionId int64) *SetAutoStakingService {
 	s.positionId = positionId
 	return s
 }
