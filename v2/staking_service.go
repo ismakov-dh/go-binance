@@ -348,16 +348,18 @@ func (s *PurchaseStakingProductService) Do(ctx context.Context, opts ...RequestO
 	if s.renewable != nil {
 		m["renewable"] = *s.renewable
 	}
-	r.setFormParams(m)
+	r.setParams(m)
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
 		return nil, err
 	}
+
 	res := new(PurchaseStakingProductResponse)
 	err = json.Unmarshal(data, res)
 	if err != nil {
 		return nil, err
 	}
+
 	return res, nil
 }
 
