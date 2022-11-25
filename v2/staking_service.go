@@ -412,7 +412,7 @@ func (s *RedeemStakingProductService) Do(ctx context.Context, opts ...RequestOpt
 	if s.amount != nil {
 		m["amount"] = *s.amount
 	}
-	r.setFormParams(m)
+	r.setParams(m)
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
 		return nil, err
@@ -502,7 +502,7 @@ func (s *SetAutoStakingService) Do(ctx context.Context, opts ...RequestOption) (
 		"positionId": s.positionId,
 		"renewable":  s.renewable,
 	}
-	r.setFormParams(m)
+	r.setParams(m)
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
 		return nil, err
