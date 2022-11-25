@@ -443,7 +443,7 @@ func (s *StakingProductQuotaService) ProductId(productId string) *StakingProduct
 	return s
 }
 
-func (s *StakingProductQuotaService) Do(ctx context.Context) (*StakingProductPersonalQuotas, error) {
+func (s *StakingProductQuotaService) Do(ctx context.Context) (*StakingProductPersonalQuota, error) {
 	r := &request{
 		method:   http.MethodGet,
 		endpoint: "/sapi/v1/staking/personalLeftQuota",
@@ -455,15 +455,13 @@ func (s *StakingProductQuotaService) Do(ctx context.Context) (*StakingProductPer
 	if err != nil {
 		return nil, err
 	}
-	res := new(StakingProductPersonalQuotas)
+	res := new(StakingProductPersonalQuota)
 	err = json.Unmarshal(data, res)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
-
-type StakingProductPersonalQuotas []StakingProductPersonalQuota
 
 type StakingProductPersonalQuota struct {
 	LeftPersonalQuota string `json:"leftPersonalQuota"`
